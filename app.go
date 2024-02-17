@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"strings"
 
 	"github.com/m7shapan/njson"
@@ -42,13 +41,13 @@ type UserData struct {
 func (a *App) GetUserData() UserData {
 	key, err := registry.OpenKey(registry.CURRENT_USER, `Software\Paladin Studios\Stormbound`, registry.ALL_ACCESS)
 	if err != nil {
-		log.Fatal(err)
+		return UserData{}
 	}
 	defer key.Close()
 
 	names, err := key.ReadValueNames(0)
 	if err != nil {
-		log.Fatal(err)
+		return UserData{}
 	}
 
 	var analytics string
@@ -60,15 +59,13 @@ func (a *App) GetUserData() UserData {
 
 	b, _, err := key.GetBinaryValue(analytics)
 	if err != nil {
-		log.Fatal(err)
+		return UserData{}
 	}
 
 	var data UserData
-	e := njson.Unmarshal(b[:len(b)-1], &data)
-	if e != nil {
-		log.Fatal(e)
+	if e := njson.Unmarshal(b[:len(b)-1], &data); e != nil {
+		return UserData{}
 	}
-	log.Print(data)
 
 	return data
 }

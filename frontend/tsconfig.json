@@ -18,7 +18,8 @@
     "paths": {
         "$lib/*": ["src/lib/*"],
         "$components/*": ["src/components/*"],
-        "$assets/*": ["src/assets/*"]
+        "$assets/*": ["src/assets/*"],
+        "$wails/*": ["wailsjs/go/main/*"],
     }
   },
   "include": [

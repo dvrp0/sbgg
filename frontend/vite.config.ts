@@ -9,7 +9,8 @@ export default defineConfig({
         alias: {
             $lib: path.resolve("./src/lib"),
             $components: path.resolve("./src/components"),
-            $assets: path.resolve("./src/assets")
+            $assets: path.resolve("./src/assets"),
+            $wails: path.resolve("./wailsjs/go/main"),
         }
     }
 });
