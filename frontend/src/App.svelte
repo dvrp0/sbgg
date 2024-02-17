@@ -45,7 +45,7 @@
         <span>Matches</span>
         <span class="text-gray-500">Share</span>
     </div>
-    <div class="grid grid-cols-10 mt-xs gap-xs mb-4xl">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] mt-xs gap-xs mb-4xl">
         {#each Array(100) as _}
             <Match won={Math.random() > 0.5} />
         {/each}
