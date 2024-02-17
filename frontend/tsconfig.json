@@ -14,7 +14,12 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+        "$lib/*": ["src/lib/*"],
+        "$components/*": ["src/components/*"],
+        "$assets/*": ["src/assets/*"]
+    }
   },
   "include": [
     "src/**/*.d.ts",
