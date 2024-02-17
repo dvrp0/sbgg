@@ -1,12 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
 @font-face {
     font-family: "Neue Regrade";
     src: url("./assets/Neue Regrade Variable.woff2") format("woff2");
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
     --heading-1: 2rem;
