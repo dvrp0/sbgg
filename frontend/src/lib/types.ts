@@ -1,13 +1,12 @@
 export interface UserData {
-    UserId: string;
-    UserName: string;
-    UserTrophies: number;
-    UserRank: number;
-    UserLevel: number;
-    Segmentation: string;
-    TimeMatchmakingStarted: string;
-    GameTurns: number;
-    TimeMatchStarted: string;
-    RankedPlayed: number;
-    RankedWon: number;
+    userId: string;
+    userName: string;
+    userTrophies: number;
+    userRank: number;
+    userLevel: number;
+    timeMatchmakingStarted: string;
+    gameTurns: number;
+    timeMatchStarted: string;
+    rankedPlayed: number;
+    rankedWon: number;
 };

@@ -30,7 +30,6 @@ type UserData struct {
 	UserTrophies           int    `njson:"UserTrophies._content"`
 	UserRank               int    `njson:"UserRank._content"`
 	UserLevel              int    `njson:"UserLevel._content"`
-	Segmentation           string `njson:"Segmentation._content"`
 	TimeMatchmakingStarted string `njson:"TimeMatchmakingStarted._content"`
 	GameTurns              int    `njson:"GameTurns._content"`
 	TimeMatchStarted       string `njson:"TimeMatchStarted._content"`
