@@ -65,6 +65,7 @@ h3 {
 span {
     font-size: 1.15rem;
     line-height: 1;
+    margin-bottom: -3px;
 }
 
 /* TODO */
