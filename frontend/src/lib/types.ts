@@ -3,6 +3,9 @@ export interface UserData {
     username: string;
     userTrophies: number;
     userRank: number;
+    userLeague: string;
+    userDivision: number;
+    userStars: number;
     userLevel: number;
     timeMatchmakingStarted: string;
     gameTurns: number;
