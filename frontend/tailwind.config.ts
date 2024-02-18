@@ -24,7 +24,8 @@ export default {
         "gold": "#fac924",
         "platinum": "#00dd77",
         "diamond": "#674ac9",
-        "heroes": "#0081ff"
+        "heroes": "#0081ff",
+        "league": "var(--league)"
       },
     },
     spacing: {
