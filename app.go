@@ -26,7 +26,7 @@ func (a *App) startup(ctx context.Context) {
 
 type UserData struct {
 	UserId                 string `njson:"UserId._content"`
-	UserName               string `njson:"UserName._content"`
+	Username               string `njson:"Username._content"`
 	UserTrophies           int    `njson:"UserTrophies._content"`
 	UserRank               int    `njson:"UserRank._content"`
 	UserLevel              int    `njson:"UserLevel._content"`

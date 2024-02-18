@@ -1,6 +1,6 @@
 export interface UserData {
     userId: string;
-    userName: string;
+    username: string;
     userTrophies: number;
     userRank: number;
     userLevel: number;

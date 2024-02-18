@@ -3,7 +3,7 @@ import type { UserData } from "$lib/types";
 
 export function isUserDataValid(data: UserData)
 {
-    return data.userId !== "" && data.userName !== "";
+    return data.userId !== "" && data.username !== "";
 }
 
 export function convertTrophiesToLeague(trophies: number)
