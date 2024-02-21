@@ -1,6 +1,6 @@
 import { RANKS } from "$lib/constants";
 import type { UserData } from "$lib/types";
-import { GetUserData } from "$wails/App";
+import { GetUserData } from "$wails/go/main/App";
 
 export async function getUserData()
 {

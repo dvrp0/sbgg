@@ -19,7 +19,7 @@
         "$lib/*": ["src/lib/*"],
         "$components/*": ["src/components/*"],
         "$assets/*": ["src/assets/*"],
-        "$wails/*": ["wailsjs/go/main/*"],
+        "$wails/*": ["wailsjs/*"],
     }
   },
   "include": [
