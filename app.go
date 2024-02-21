@@ -3,26 +3,12 @@ package main
 import (
 	"context"
 	"strings"
+	"syscall"
 
 	"github.com/m7shapan/njson"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/sys/windows/registry"
 )
-
-// App struct
-type App struct {
-	ctx context.Context
-}
-
-// NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{}
-}
-
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
-	a.ctx = ctx
-}
 
 type UserData struct {
 	UserId                 string `njson:"UserId._content"`
@@ -35,6 +21,36 @@ type UserData struct {
 	TimeMatchStarted       string `njson:"TimeMatchStarted._content"`
 	RankedPlayed           int    `njson:"RankedPlayed._content"`
 	RankedWon              int    `njson:"RankedWon._content"`
+}
+
+type Match struct {
+	Date           string `json:"date"`
+	Turns          int    `json:"turns"`
+	UntrackedWins  int    `json:"untrackedWins"`
+	UntrackedLoses int    `json:"untrackedLoses"`
+	Won            bool   `json:"won"`
+	Streak         int    `json:"streak"`
+	TrophiesFrom   int    `json:"trophiesFrom"`
+	TrophiesTo     int    `json:"trophiesTo"`
+}
+
+// App struct
+type App struct {
+	ctx      context.Context
+	userData UserData
+}
+
+// NewApp creates a new App application struct
+func NewApp() *App {
+	return &App{}
+}
+
+// startup is called when the app starts. The context is saved
+// so we can call the runtime methods
+func (a *App) startup(ctx context.Context) {
+	a.ctx = ctx
+	a.userData = a.GetUserData()
+	a.monitorUserData()
 }
 
 func (a *App) GetUserData() UserData {
@@ -67,4 +83,32 @@ func (a *App) GetUserData() UserData {
 	}
 
 	return data
+}
+
+func (a *App) monitorUserData() {
+	var regNotifyChangeKeyValue *syscall.Proc
+
+	if advapi32, err := syscall.LoadDLL("advapi32.dll"); err == nil {
+		if proc, err := advapi32.FindProc("RegNotifyChangeKeyValue"); err == nil {
+			regNotifyChangeKeyValue = proc
+		} // else
+	}
+
+	if regNotifyChangeKeyValue != nil {
+		go func() {
+			key, err := registry.OpenKey(registry.CURRENT_USER, `Software\Paladin Studios\Stormbound`, syscall.KEY_NOTIFY)
+			if err != nil {
+				return
+			}
+
+			for {
+				regNotifyChangeKeyValue.Call(uintptr(key), 0, 0x00000001|0x00000004, 0, 0)
+				data := a.GetUserData()
+
+				if a.userData != data {
+					runtime.EventsEmit(a.ctx, "userDataChanged", data)
+				}
+			}
+		}()
+	}
 }
