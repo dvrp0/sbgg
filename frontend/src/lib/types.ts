@@ -1,4 +1,4 @@
-export interface UserData {
+export interface RegistryData {
     userId: string;
     username: string;
     userTrophies: number;
