@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/m7shapan/njson"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -42,6 +43,7 @@ type Match struct {
 type Profile struct {
 	IsDarkMode     bool    `json:"isDarkMode"`
 	IsLeagueThemed bool    `json:"isLeagueThemed"`
+	UserTrophies   int     `json:"userTrophies"`
 	RankedPlayed   int     `json:"rankedPlayed"`
 	RankedWon      int     `json:"rankedWon"`
 	Matches        []Match `json:"matches"`
@@ -110,16 +112,49 @@ func (a *App) GetRegistryData() (*RegistryData, error) {
 	return &data, nil
 }
 
-func (a *App) GetProfile() (*Profile, error) {
-	var profile Profile
-
+func (a *App) getProfilePath() (string, string, error) {
 	dir, err := os.UserConfigDir()
 	if err != nil {
-		return nil, err
+		return "", "", err
 	}
 
 	dir = filepath.Join(dir, "sbgg")
 	path := filepath.Join(dir, a.registryData.UserId+".json")
+
+	return dir, path, nil
+}
+
+func (a *App) saveProfile(data *Profile) error {
+	_, path, err := a.getProfilePath()
+	if err != nil {
+		return err
+	}
+
+	bytes, err := json.MarshalIndent(*data, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if _, err = f.Write(bytes); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) GetProfile() (*Profile, error) {
+	var profile Profile
+
+	dir, path, err := a.getProfilePath()
+	if err != nil {
+		return nil, err
+	}
 
 	if _, err := os.Stat(path); err == nil {
 		log.Print("Profile exists")
@@ -132,6 +167,24 @@ func (a *App) GetProfile() (*Profile, error) {
 		if err = json.Unmarshal(data, &profile); err != nil {
 			return nil, err
 		}
+
+		// There are some untracked games and trophies were updated
+		if profile.UserTrophies != a.registryData.UserTrophies {
+			match := Match{
+				Date:         time.Now().Format("2006-01-02 15:04:05"),
+				TrophiesFrom: profile.UserTrophies,
+				TrophiesTo:   a.registryData.UserTrophies,
+			}
+
+			// User played untracked games in this device
+			if profile.RankedPlayed != a.registryData.RankedPlayed {
+				match.UntrackedWins = a.registryData.RankedWon - profile.RankedWon
+				match.UntrackedLoses = (a.registryData.RankedPlayed - a.registryData.RankedWon) - (profile.RankedPlayed - profile.RankedWon)
+			}
+
+			profile.Matches = append(profile.Matches, match)
+			a.saveProfile(&profile)
+		}
 	} else if errors.Is(err, os.ErrNotExist) {
 		log.Print("Profile does not exist")
 
@@ -143,24 +196,12 @@ func (a *App) GetProfile() (*Profile, error) {
 		profile = Profile{
 			IsDarkMode:     false,
 			IsLeagueThemed: true,
+			UserTrophies:   a.registryData.UserTrophies,
 			RankedPlayed:   a.registryData.RankedPlayed,
 			RankedWon:      a.registryData.RankedWon,
 			Matches:        []Match{},
 		}
-		bytes, err := json.MarshalIndent(profile, "", "  ")
-		if err != nil {
-			return nil, err
-		}
-
-		f, err := os.Create(path)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-
-		if _, err = f.Write(bytes); err != nil {
-			return nil, err
-		}
+		a.saveProfile(&profile)
 	}
 
 	return &profile, nil
@@ -188,6 +229,21 @@ func (a *App) monitorRegistryData() {
 
 				if err == nil && a.registryData != *data {
 					runtime.EventsEmit(a.ctx, "userDataChanged", *data)
+					a.registryData = *data
+
+					// There is a new game finished
+					if a.registryData.RankedPlayed != a.profile.RankedPlayed {
+						match := Match{
+							Date:         time.Now().Format("2006-01-02 15:04:05"),
+							Turns:        a.registryData.GameTurns,
+							Won:          a.registryData.RankedWon > a.profile.RankedWon,
+							TrophiesFrom: a.profile.UserTrophies,
+							TrophiesTo:   a.registryData.UserTrophies,
+						}
+
+						a.profile.Matches = append(a.profile.Matches, match)
+						a.saveProfile(&a.profile)
+					}
 				}
 			}
 		}()
