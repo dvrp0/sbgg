@@ -29,6 +29,7 @@ export namespace main {
 	export class Profile {
 	    isDarkMode: boolean;
 	    isLeagueThemed: boolean;
+	    userTrophies: number;
 	    rankedPlayed: number;
 	    rankedWon: number;
 	    matches: Match[];
@@ -41,6 +42,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.isDarkMode = source["isDarkMode"];
 	        this.isLeagueThemed = source["isLeagueThemed"];
+	        this.userTrophies = source["userTrophies"];
 	        this.rankedPlayed = source["rankedPlayed"];
 	        this.rankedWon = source["rankedWon"];
 	        this.matches = this.convertValues(source["matches"], Match);

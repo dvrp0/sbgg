@@ -2,7 +2,7 @@ import { RANKS } from "$lib/constants";
 import type { RegistryData } from "$lib/types";
 import { GetRegistryData } from "$wails/go/main/App";
 
-export async function getUserData()
+export async function getRegistryData()
 {
     const base = await GetRegistryData();
 

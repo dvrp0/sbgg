@@ -4,7 +4,8 @@
     import Match from "$components/Match.svelte";
     import Skeleton from "$components/Skeleton.svelte";
     import { TAILWIND, user } from "$lib/store";
-    import { getUserData } from "$lib/utils";
+    import { getRegistryData } from "$lib/utils";
+    import { EventsOn } from "$wails/runtime";
 
     let isMounted = false;
 
@@ -13,8 +14,12 @@
     $: winRate = ($user.rankedWon / $user.rankedPlayed * 100).toFixed(1);
 
     onMount(async () => {
-        $user = await getUserData();
+        $user = await getRegistryData();
         document.documentElement.style.setProperty("--league", $TAILWIND.theme.colors[$user.userLeague]);
+
+        EventsOn("dataChanged", async () => {
+            $user = await getRegistryData();
+        });
 
         isMounted = true;
     });
