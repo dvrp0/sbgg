@@ -117,28 +117,25 @@ func (a *App) getProfilePath() (dir string, path string, err error) {
 	if err != nil {
 		return "", "", err
 	}
-	log.Print(a.registryData)
+
 	dir = filepath.Join(dir, "sbgg")
 	path = filepath.Join(dir, a.registryData.UserId+".json")
 
 	return dir, path, nil
 }
 
-func (a *App) updateProfile() {
+func (a *App) updateProfile(data *Profile) error {
+	a.profile = *data
 	a.profile.UserTrophies = a.registryData.UserTrophies
 	a.profile.RankedPlayed = a.registryData.RankedPlayed
 	a.profile.RankedWon = a.registryData.RankedWon
-}
-
-func (a *App) saveProfile(data *Profile) error {
-	a.profile = *data
 
 	_, path, err := a.getProfilePath()
 	if err != nil {
 		return err
 	}
 
-	bytes, err := json.MarshalIndent(*data, "", "  ")
+	bytes, err := json.MarshalIndent(a.profile, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -183,9 +180,10 @@ func (a *App) GetProfile() (*Profile, error) {
 				Date:         time.Now().Format("2006-01-02 15:04:05"),
 				TrophiesFrom: profile.UserTrophies,
 				TrophiesTo:   a.registryData.UserTrophies,
+				UntrackedWins: 0,
+				UntrackedLoses: 0,
 			})
-			a.updateProfile()
-			a.saveProfile(&profile)
+			a.updateProfile(&profile)
 		} else if profile.RankedPlayed != a.registryData.RankedPlayed || profile.RankedWon != a.registryData.RankedWon { // User played untracked games in this device
 			profile.Matches = append(profile.Matches, Match{
 				Date:           time.Now().Format("2006-01-02 15:04:05"),
@@ -194,8 +192,7 @@ func (a *App) GetProfile() (*Profile, error) {
 				UntrackedWins:  a.registryData.RankedWon - profile.RankedWon,
 				UntrackedLoses: (a.registryData.RankedPlayed - a.registryData.RankedWon) - (profile.RankedPlayed - profile.RankedWon),
 			})
-			a.updateProfile()
-			a.saveProfile(&profile)
+			a.updateProfile(&profile)
 		}
 	} else if errors.Is(err, os.ErrNotExist) {
 		log.Print("Profile does not exist")
@@ -213,8 +210,7 @@ func (a *App) GetProfile() (*Profile, error) {
 			RankedWon:      a.registryData.RankedWon,
 			Matches:        []Match{},
 		}
-		a.updateProfile()
-		a.saveProfile(&profile)
+		a.updateProfile(&profile)
 	}
 
 	return &profile, nil
@@ -254,11 +250,10 @@ func (a *App) monitorRegistryData() {
 							TrophiesFrom: a.profile.UserTrophies,
 							TrophiesTo:   a.registryData.UserTrophies,
 						})
-						a.updateProfile()
 						if is_won {
-							a.profile.RankedWon++ // Manually update RankedWon because it is updated later than UserTrophies
+							a.registryData.RankedWon++ // Manually update RankedWon because it is updated later than UserTrophies
 						}
-						a.saveProfile(&a.profile)
+						a.updateProfile(&a.profile)
 					}
 
 					runtime.EventsEmit(a.ctx, "dataChanged")
