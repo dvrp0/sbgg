@@ -1,6 +1,6 @@
 import { RANKS } from "$lib/constants";
 import type { main } from "$wails/go/models";
-import { GetRegistryData } from "$wails/go/main/App";
+import { GetProfile, GetRegistryData } from "$wails/go/main/App";
 
 export async function getRegistryData()
 {
@@ -14,6 +14,14 @@ export async function getRegistryData()
             userDivision: leagueData.division,
             userStars: leagueData.stars
         };
+
+    return data;
+}
+
+export async function getProfile()
+{
+    let data = await GetProfile();
+    data.matches = data.matches.reverse();
 
     return data;
 }

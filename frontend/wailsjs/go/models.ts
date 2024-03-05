@@ -3,6 +3,7 @@ export namespace main {
 	export class Match {
 	    date: string;
 	    turns: number;
+	    untracked: boolean;
 	    untrackedWins: number;
 	    untrackedLoses: number;
 	    won: boolean;
@@ -18,6 +19,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.date = source["date"];
 	        this.turns = source["turns"];
+	        this.untracked = source["untracked"];
 	        this.untrackedWins = source["untrackedWins"];
 	        this.untrackedLoses = source["untrackedLoses"];
 	        this.won = source["won"];
