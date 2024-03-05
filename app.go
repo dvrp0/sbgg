@@ -57,6 +57,7 @@ type RegistryData struct {
 type Match struct {
 	Date           string `json:"date"`
 	Turns          int    `json:"turns"`
+	Untracked      bool   `json:"untracked"`
 	UntrackedWins  int    `json:"untrackedWins"`
 	UntrackedLoses int    `json:"untrackedLoses"`
 	Won            bool   `json:"won"`
@@ -209,22 +210,14 @@ func (a *App) GetProfile() (*Profile, error) {
 			return nil, err
 		}
 
-		// There are some untracked games that did not play in this device
-		// Matches can't be tracked if games were played in another device and trophies were not updated too
-		if profile.RankedPlayed == a.registryData.RankedPlayed && profile.RankedWon == a.registryData.RankedWon && profile.UserTrophies != a.registryData.UserTrophies {
+		// There are some untracked games
+		// Matches can't be tracked if games were played in another device and trophies were not updated
+		if profile.UserTrophies != a.registryData.UserTrophies {
 			profile.Matches = append(profile.Matches, Match{
 				Date:           time.Now().Format("2006-01-02 15:04:05"),
 				TrophiesFrom:   profile.UserTrophies,
 				TrophiesTo:     a.registryData.UserTrophies,
-				UntrackedWins:  0,
-				UntrackedLoses: 0,
-			})
-			a.updateProfile(&profile)
-		} else if profile.RankedPlayed != a.registryData.RankedPlayed || profile.RankedWon != a.registryData.RankedWon { // User played untracked games in this device
-			profile.Matches = append(profile.Matches, Match{
-				Date:           time.Now().Format("2006-01-02 15:04:05"),
-				TrophiesFrom:   profile.UserTrophies,
-				TrophiesTo:     a.registryData.UserTrophies,
+				Untracked:      true,
 				UntrackedWins:  a.registryData.RankedWon - profile.RankedWon,
 				UntrackedLoses: (a.registryData.RankedPlayed - a.registryData.RankedWon) - (profile.RankedPlayed - profile.RankedWon),
 			})
