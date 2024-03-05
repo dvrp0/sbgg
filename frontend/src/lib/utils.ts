@@ -1,23 +1,10 @@
 import { RANKS } from "$lib/constants";
-import type { RegistryData } from "$lib/types";
+import type { main } from "$wails/go/models";
 import { GetRegistryData } from "$wails/go/main/App";
 
 export async function getRegistryData()
 {
-    const base = await GetRegistryData();
-
-    let data = {
-        userId: base.UserId,
-        username: base.Username,
-        userTrophies: base.UserTrophies,
-        userRank: base.UserRank,
-        userLevel: base.UserLevel,
-        timeMatchmakingStarted: base.TimeMatchmakingStarted,
-        gameTurns: base.GameTurns,
-        timeMatchStarted: base.TimeMatchStarted,
-        rankedPlayed: base.RankedPlayed,
-        rankedWon: base.RankedWon
-    } as RegistryData;
+    let data = await GetRegistryData();
 
     const leagueData = convertTrophiesToLeague(data.userTrophies);
     if (leagueData)
@@ -31,7 +18,7 @@ export async function getRegistryData()
     return data;
 }
 
-export function isRegistryDataValid(data: RegistryData)
+export function isRegistryDataValid(data: main.RegistryData)
 {
     return data.userId !== "" && data.username !== "";
 }

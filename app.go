@@ -11,22 +11,47 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/m7shapan/njson"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/sys/windows/registry"
 )
 
+type IntField struct {
+	Content int `json:"_content"`
+	Type string `json:"_type"`
+}
+
+type StringField struct {
+	Content string `json:"_content"`
+	Type string `json:"_type"`
+}
+
+type RawRegistryData struct {
+	UserId                 StringField `json:"UserId"`
+	Username               StringField `json:"Username"`
+	UserTrophies           IntField `json:"UserTrophies"`
+	UserRank               IntField `json:"UserRank"`
+	UserLevel              IntField `json:"UserLevel"`
+	TimeMatchmakingStarted StringField `json:"TimeMatchmakingStarted"`
+	GameTurns              IntField `json:"GameTurns"`
+	TimeMatchStarted       StringField `json:"TimeMatchStarted"`
+	RankedPlayed           IntField `json:"RankedPlayed"`
+	RankedWon              IntField `json:"RankedWon"`
+}
+
 type RegistryData struct {
-	UserId                 string `njson:"UserId._content"`
-	Username               string `njson:"Username._content"`
-	UserTrophies           int    `njson:"UserTrophies._content"`
-	UserRank               int    `njson:"UserRank._content"`
-	UserLevel              int    `njson:"UserLevel._content"`
-	TimeMatchmakingStarted string `njson:"TimeMatchmakingStarted._content"`
-	GameTurns              int    `njson:"GameTurns._content"`
-	TimeMatchStarted       string `njson:"TimeMatchStarted._content"`
-	RankedPlayed           int    `njson:"RankedPlayed._content"`
-	RankedWon              int    `njson:"RankedWon._content"`
+	UserId                 string `json:"userId"`
+	Username               string `json:"username"`
+	UserTrophies           int    `json:"userTrophies"`
+	UserRank               int    `json:"userRank"`
+	UserLeague             string `json:"userLeague"`
+	UserDivision           int `json:"userDivision"`
+	UserStars              int `json:"userStars"`
+	UserLevel              int    `json:"userLevel"`
+	TimeMatchmakingStarted string `json:"timeMatchmakingStarted"`
+	GameTurns              int    `json:"gameTurns"`
+	TimeMatchStarted       string `json:"timeMatchStarted"`
+	RankedPlayed           int    `json:"rankedPlayed"`
+	RankedWon              int    `json:"rankedWon"`
 }
 
 type Match struct {
@@ -104,12 +129,23 @@ func (a *App) GetRegistryData() (*RegistryData, error) {
 		return nil, err
 	}
 
-	var data RegistryData
-	if err = njson.Unmarshal(b[:len(b)-1], &data); err != nil {
+	var raw RawRegistryData
+	if err = json.Unmarshal(b[:len(b)-1], &raw); err != nil {
 		return nil, err
 	}
 
-	return &data, nil
+	return &RegistryData{
+		UserId: raw.UserId.Content,
+		Username: raw.Username.Content,
+		UserTrophies: raw.UserTrophies.Content,
+		UserRank: raw.UserRank.Content,
+		UserLevel: raw.UserLevel.Content,
+		TimeMatchmakingStarted: raw.TimeMatchmakingStarted.Content,
+		GameTurns: raw.GameTurns.Content,
+		TimeMatchStarted: raw.TimeMatchStarted.Content,
+		RankedPlayed: raw.RankedPlayed.Content,
+		RankedWon: raw.RankedWon.Content,
+	}, nil
 }
 
 func (a *App) getProfilePath() (dir string, path string, err error) {
@@ -177,10 +213,10 @@ func (a *App) GetProfile() (*Profile, error) {
 		// Matches can't be tracked if games were played in another device and trophies were not updated too
 		if profile.RankedPlayed == a.registryData.RankedPlayed && profile.RankedWon == a.registryData.RankedWon && profile.UserTrophies != a.registryData.UserTrophies {
 			profile.Matches = append(profile.Matches, Match{
-				Date:         time.Now().Format("2006-01-02 15:04:05"),
-				TrophiesFrom: profile.UserTrophies,
-				TrophiesTo:   a.registryData.UserTrophies,
-				UntrackedWins: 0,
+				Date:           time.Now().Format("2006-01-02 15:04:05"),
+				TrophiesFrom:   profile.UserTrophies,
+				TrophiesTo:     a.registryData.UserTrophies,
+				UntrackedWins:  0,
 				UntrackedLoses: 0,
 			})
 			a.updateProfile(&profile)
