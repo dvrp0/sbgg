@@ -1,7 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
 @font-face {
+    font-family: "Pretendard";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("./assets/fonts/PretendardVariable.woff2") format("woff2");
+}
+@font-face {
     font-family: "Neue Regrade";
-    src: url("./assets/Neue Regrade Variable.woff2") format("woff2");
+    font-weight: 400;
+    src: url("./assets/fonts/Neue Regrade Variable.woff2") format("woff2");
 }
 
 @tailwind base;
@@ -9,17 +17,10 @@
 @tailwind utilities;
 
 :root {
-    --heading-1: 2rem;
-    --heading-2: 1.25rem;
-    --heading-3: 1.15rem;
-    --body-1: 1rem;
-    --body-2: 0.85rem;
     --league: theme("colors.iron");
 
-    color: theme("colors.gray.900");
-    background-color: theme("colors.white");
-    font-family: "Neue Regrade", sans-serif;
-    font-weight: 400;
+    @apply text-gray-900 bg-white;
+
     word-break: keep-all;
     line-height: 1.4;
     text-wrap: balance;
@@ -41,25 +42,25 @@ body {
 }
 
 h1 {
-    font-family: "Montserrat", sans-serif;
+    @apply font-big font-black;
+
     font-size: 4.25rem;
-    font-weight: 900;
     line-height: 1;
     margin-bottom: -0.5rem;
 }
 
 h2 {
-    font-family: "Neue Regrade", sans-serif;
+    @apply font-special font-bold;
+
     font-size: 2.25rem;
-    font-weight: 900;
     line-height: 1;
     margin-bottom: -0.5rem;
 }
 
 h3 {
-    font-family: "Neue Regrade", sans-serif;
+    @apply font-special font-bold;
+
     font-size: 1.35rem;
-    font-weight: 700;
     line-height: 1;
 }
 

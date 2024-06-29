@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import fontVariationSettings from "./src/lib/tailwind/plugins/fontVariationSettingsPlugin";
 
 export default {
   content: ["./src/**/*.{html,js,ts,svelte}"],
@@ -59,7 +60,14 @@ export default {
       DEFAULT: "16px",
       "lg": "24px",
       "full": "9999px"
+    },
+    fontFamily: {
+      "sans": ["Pretendard"],
+      "special": ["Neue Regrade"],
+      "big": ["Montserrat"],
     }
   },
-  plugins: [],
+  plugins: [
+    fontVariationSettings
+  ],
 } satisfies Config;

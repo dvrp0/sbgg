@@ -34,12 +34,12 @@
             <Skeleton kind="body" />
         </div>
     {:else}
-        <div class="flex items-center">
-            <span class="font-black">{$user.username}</span><span class="text-gray-500">#{$user.userId}</span>
+        <div class="flex items-center font-special">
+            <span class="font-bold">{$user.username}</span><span class="text-gray-500">#{$user.userId}</span>
             <div class="mx-2xs">
                 <Icon kind="sparkle" />
             </div>
-            <Icon kind="base" /><span class="ml-3xs">{$user.userLevel}</span>
+            <Icon kind="base" /><span class="ml-3xs font-medium">{$user.userLevel}</span>
         </div>
         <div class="flex mt-xs items-center">
             <h1 class="text-league">{$user.userLeague} {$user.userDivision}</h1>
